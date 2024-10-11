@@ -1,64 +1,87 @@
 import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
+import { Profile } from './entities/profile.entity';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
-export class UsersService {
-    private users = [
-        {
-            id: 1,
-            nombre: "Juan",
-            apellido: "Pérez",
-            correo: "juanperez@example.com"
-        },
-        {
-            id: 2,
-            nombre: "María",
-            apellido: "García",
-            correo: "mariagarcia@example.com"
-        },
-        {
-            id: 3,
-            nombre: "Pedro",
-            apellido: "Rodríguez",
-            correo: "pedrorodriguez@example.com"
-        }
-    ]
+export class UsersService { 
+    constructor(
+        @InjectRepository(User)
+        private readonly userRepository:Repository<User>,
 
-    findAll(){
-        return this.users
+        @InjectRepository(Profile)
+        private readonly profileRepository:Repository<Profile>
+    ){}
+
+    async findAll(){
+        return await this.userRepository.find()
     }
 
-    findOne( id: number ){
-        const user = this.users.find(user => user.id === id) 
+    async findOne( id: number ){
+        const user = await this.userRepository.findOne({ where:{ id }, select: ['id', 'username'], relations:['profile'] }) 
+        
         if (!user) {
             throw new NotFoundException({
-                message: "Usuario no existe",
+                message: `Usuario con id: ${id} no existe`,
                 status: HttpStatus.NOT_FOUND
             })
         }
+        return user
 
     }
 
-    create(user: any){
-        this.users.push(user);
-        return user.id;
+    async create(payload: CreateUserDto){
+        const newProfile = new Profile()
+        newProfile.name = payload.name
+        newProfile.lastname = payload.lastname
+        newProfile.email = payload.email
+        newProfile.age = payload.age
+
+        const createdProfile = await this.profileRepository.save(newProfile)
+
+        const newUser = new User()
+        newUser.username = payload.username
+        newUser.password = payload.password
+        newUser.active = true
+        newUser.profile = createdProfile
+
+        const createdUser = await this.userRepository.save(newUser)
+
+        return createdUser
     }
 
-    delete(id: number){
-        const index = this.users.findIndex(user => user.id === id) 
-        console.log(index);
+    async delete(id: number){
+        const user = await this.userRepository.findOne({ where:{ id }, relations:['profile'] }) 
         
-        if (index === -1) {
+        if (!user) {
             throw new NotFoundException({
-                message: "Usuario no existe",
+                message: `Usuario con id: ${id} no existe`,
                 status: HttpStatus.NOT_FOUND
             })
         }
-        this.users.splice(index, 1)
-        return "usuario eliminado"
+
+        await this.userRepository.delete(id)
+        await this.profileRepository.delete(user.profile.id)
+        return user
+        
     }
 
-    update(id: number, body: any){
-        return "usuario actualizado"
+    async update(id: number, payload: UpdateUserDto){
+        const user = await this.userRepository.findOne({ where:{ id }, relations:['profile'] }) 
+        
+        if (!user) {
+            throw new NotFoundException({
+                message: `Usuario con id: ${id} no existe`,
+                status: HttpStatus.NOT_FOUND
+            })
+        }
+
+        user.password = payload.password
+        await this.userRepository.save(user)
+        return user
     }
 
 
