@@ -1,28 +1,30 @@
-import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { Profile } from './entities/profile.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { hash, compare } from 'bcryptjs'
+import { AuthDto } from 'src/auth/dto/auth.dto';
 
 @Injectable()
-export class UsersService { 
+export class UsersService {
     constructor(
         @InjectRepository(User)
-        private readonly userRepository:Repository<User>,
+        private readonly userRepository: Repository<User>,
 
         @InjectRepository(Profile)
-        private readonly profileRepository:Repository<Profile>
-    ){}
+        private readonly profileRepository: Repository<Profile>
+    ) { }
 
-    async findAll(){
-        return await this.userRepository.find()
+    async findAll() {
+        return await this.userRepository.find({ relations: ['profile'] })
     }
 
-    async findOne( id: number ){
-        const user = await this.userRepository.findOne({ where:{ id }, select: ['id', 'username'], relations:['profile'] }) 
-        
+    async findOne(id: number) {
+        const user = await this.userRepository.findOne({ where: { id }, select: ['id', 'username'], relations: ['profile'] })
+
         if (!user) {
             throw new NotFoundException({
                 message: `Usuario con id: ${id} no existe`,
@@ -33,7 +35,44 @@ export class UsersService {
 
     }
 
-    async create(payload: CreateUserDto){
+    async login(username: string, password: string) {
+
+        /** Verify if user exits */
+        const user = await this.userRepository.findOne({
+            where: { username },
+            select: ['id', 'username', 'password', 'roles', 'active']
+        })
+        if (!user) throw new UnauthorizedException(`Usuario con username ${username} no encontrado`)
+
+        /** validate password */
+        const isOk = await this.passwordCompare(password, user.password)
+        if(!isOk) throw new UnauthorizedException(`Password incorrect`)
+
+        return user
+
+    }
+
+    async register( payload: AuthDto){
+
+        const newUser = new User()
+        newUser.username = payload.username
+        newUser.password = await this.passwordHash(payload.password)
+        newUser.active = true
+
+        const createdUser = await this.userRepository.save(newUser)
+
+        return createdUser
+    }
+
+    async passwordCompare(passwordPayload: string, passwordHash: string) {
+        return compare(passwordPayload, passwordHash)
+    }
+
+    async passwordHash(password: string) {
+        return hash(password, 10)
+    }
+
+    async create(payload: CreateUserDto) {
         const newProfile = new Profile()
         newProfile.name = payload.name
         newProfile.lastname = payload.lastname
@@ -44,7 +83,8 @@ export class UsersService {
 
         const newUser = new User()
         newUser.username = payload.username
-        newUser.password = payload.password
+        newUser.password = await this.passwordHash(payload.password)
+        newUser.roles =  payload.roles 
         newUser.active = true
         newUser.profile = createdProfile
 
@@ -53,9 +93,9 @@ export class UsersService {
         return createdUser
     }
 
-    async delete(id: number){
-        const user = await this.userRepository.findOne({ where:{ id }, relations:['profile'] }) 
-        
+    async delete(id: number) {
+        const user = await this.userRepository.findOne({ where: { id }, relations: ['profile'] })
+
         if (!user) {
             throw new NotFoundException({
                 message: `Usuario con id: ${id} no existe`,
@@ -66,12 +106,12 @@ export class UsersService {
         await this.userRepository.delete(id)
         await this.profileRepository.delete(user.profile.id)
         return user
-        
+
     }
 
-    async update(id: number, payload: UpdateUserDto){
-        const user = await this.userRepository.findOne({ where:{ id }, relations:['profile'] }) 
-        
+    async update(id: number, payload: UpdateUserDto) {
+        const user = await this.userRepository.findOne({ where: { id }, relations: ['profile'] })
+
         if (!user) {
             throw new NotFoundException({
                 message: `Usuario con id: ${id} no existe`,
@@ -79,7 +119,7 @@ export class UsersService {
             })
         }
 
-        user.password = payload.password
+        user.password = await this.passwordHash(payload.password)
         await this.userRepository.save(user)
         return user
     }
