@@ -32,4 +32,7 @@ export class User {
     })
     @JoinColumn({ name: 'profile_id'})
     profile: Profile
+
+
+    
 }

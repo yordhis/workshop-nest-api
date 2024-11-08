@@ -6,6 +6,8 @@ import { AuthModule } from './auth/auth.module';
 import { AuthGuard } from './auth/guards/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './auth/guards/roles.guard';
+import { ArticlesModule } from './articles/articles.module';
+import { CaslModule } from './casl/casl.module';
 
 @Module({
   imports: [
@@ -21,9 +23,10 @@ import { RolesGuard } from './auth/guards/roles.guard';
       synchronize: true,
     }),
     UsersModule,
-    AuthModule
+    AuthModule,
+    ArticlesModule,
+    CaslModule
   ],
-  controllers: [],
   providers: [
     {
       provide: APP_GUARD,

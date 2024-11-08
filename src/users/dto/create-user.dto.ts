@@ -1,4 +1,4 @@
-import { IsEmail, IsEmpty, IsNotEmpty, IsNumber, IsString } from "class-validator"
+import { IsArray, IsEmail, IsNotEmpty, IsNumber, IsString } from "class-validator"
 import { UserRoles } from "../types/Roles"
 
 export class CreateUserDto {
@@ -10,8 +10,7 @@ export class CreateUserDto {
     @IsNotEmpty()
     password: string
 
-    @IsString()
-    @IsNotEmpty()
+    @IsArray()
     roles: UserRoles[]
     
     @IsString()

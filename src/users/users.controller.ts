@@ -5,6 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserRoles } from './types/Roles';
 
+@Roles(UserRoles.ADMIN)
 @Controller('users')
 export class UsersController {
     constructor(
@@ -12,7 +13,6 @@ export class UsersController {
     ){}
 
 @Get()
-@Roles(UserRoles.ADMIN)
 findAll(){
     return this.usersService.findAll()
 }

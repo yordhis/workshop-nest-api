@@ -1,0 +1,19 @@
+import { User } from "src/users/entities/user.entity";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+
+@Entity({name: "articles"})
+export class Article {
+    
+    @PrimaryGeneratedColumn('increment')
+    id: number
+
+    @Column({ type: 'text', length: 255 })
+    message: string
+
+    @Column({ type: 'boolean', name: 'is_published', default: true })
+    isPublished: boolean
+    
+    @ManyToOne(()=> User, user => user.id)
+    @JoinColumn({ name: 'author_id'})
+    authorId: number
+}
