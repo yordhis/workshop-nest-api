@@ -1,8 +1,18 @@
 import { Module } from '@nestjs/common';
-import { ArticlesControllerController } from './articles.controller.controller';
+
 import { ArticlesController } from './articles.controller';
+import { CaslModule } from 'src/casl/casl.module';
+import { ArticleService } from './articles.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Article } from './entities/article.entity';
 
 @Module({
-  controllers: [ArticlesControllerController, ArticlesController]
+  imports: [ 
+    TypeOrmModule.forFeature([ Article ]), 
+    CaslModule 
+  ],
+  controllers: [ ArticlesController ],
+  providers: [ ArticleService ],
+  exports: [ ArticleService ]
 })
 export class ArticlesModule {}

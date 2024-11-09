@@ -3,7 +3,7 @@ import { IsBoolean, IsNotEmpty, IsNumber, IsString } from "class-validator"
 export class UpdateArticleDto {
     @IsString()
     @IsNotEmpty()
-    message: string
+    description: string
 
     @IsBoolean()
     isPublished: boolean

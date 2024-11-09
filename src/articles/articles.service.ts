@@ -20,8 +20,8 @@ export class ArticleService {
         return await this.articleRepository.findOneBy({ id })
     }
    
-    async filterForMessage( message: string ){
-        return await this.articleRepository.findBy({ message: Like(`%${message}%`)  })
+    async filterForMessage( description: string ){
+        return await this.articleRepository.findBy({ description: Like(`%${description}%`)  })
     }
    
     async filterForAuthor( authorId: number ){
@@ -31,7 +31,7 @@ export class ArticleService {
     async create(createArticleDto: CreateArticleDto){
         const newArticle = new Article
         newArticle.authorId = createArticleDto.authorId
-        newArticle.message = createArticleDto.message
+        newArticle.description = createArticleDto.description
         newArticle.isPublished = createArticleDto.isPublished
 
         return await this.articleRepository.save(newArticle)
@@ -47,7 +47,7 @@ export class ArticleService {
             })
         }
 
-        article.message = data.message
+        article.description = data.description
         await this.articleRepository.save(article)
         return article
     }
