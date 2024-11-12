@@ -6,9 +6,7 @@ export class UpdateArticleDto {
     description: string
 
     @IsBoolean()
+    @IsNotEmpty()
     isPublished: boolean
-
-    @IsNumber()
-    authorId: number
 
 }

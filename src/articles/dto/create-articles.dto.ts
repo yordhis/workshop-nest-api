@@ -5,12 +5,4 @@ export class CreateArticleDto {
     @IsString()
     description: string
 
-    @IsNotEmpty()
-    @IsBoolean()
-    isPublished: boolean
-
-    @IsNotEmpty()
-    @IsNumber()
-    authorId: number
-
 }

@@ -10,7 +10,7 @@ export class Article {
     @Column({ type: 'text'})
     description: string
 
-    @Column({ type: 'boolean', name: 'is_published', default: true })
+    @Column({ type: 'boolean', name: 'is_published', default: false })
     isPublished: boolean
     
     @ManyToOne(()=> User, user => user.id)
