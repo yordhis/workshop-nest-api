@@ -42,7 +42,7 @@ export class UsersService {
             where: { username },
             select: ['id', 'username', 'password', 'roles', 'active']
         })
-        if (!user) throw new UnauthorizedException(`Usuario con username ${username} no encontrado`)
+        if (!user) throw new UnauthorizedException(`Usuario *${username}* no encontrado`)
 
         /** validate password */
         const isOk = await this.passwordCompare(password, user.password)

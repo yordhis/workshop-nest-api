@@ -17,7 +17,7 @@ findAll(){
     return this.usersService.findAll()
 }
 
-@Get(":id")
+@Get(':id')
 findOne(@Param('id', ParseIntPipe ) id: number ){
     return this.usersService.findOne(id)
 }
@@ -27,12 +27,12 @@ create( @Body() body: CreateUserDto ){
     return this.usersService.create( body )
 }
 
-@Delete(":id")
+@Delete(':id')
 delete( @Param('id', ParseIntPipe) id: number ){
     return this.usersService.delete( id )
 }
 
-@Patch(":id")
+@Patch(':id')
 update( @Param('id', ParseIntPipe) id:number, @Body() body:UpdateUserDto ){
     return this.usersService.update(id, body)
 }
