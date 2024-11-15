@@ -8,6 +8,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { ArticlesModule } from './articles/articles.module';
 import { CaslModule } from './casl/casl.module';
+import { PoliciesGuard } from './casl/guards/policies.guard';
 
 @Module({
   imports: [
@@ -35,6 +36,10 @@ import { CaslModule } from './casl/casl.module';
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: PoliciesGuard,
     }
   ],
 })

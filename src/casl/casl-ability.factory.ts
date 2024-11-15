@@ -32,7 +32,7 @@ export class CaslAbilityFactory {
       }
 
       /** Aqui se asigna permisos de edicion si le pertenece el articulo al usuario */
-      can(Action.Update, Article, { authorId: user.id });
+      cannot(Action.Update, Article, { user:user });
 
       /** Si ya esta publicado no permite eliminar */
       cannot(Action.Delete, Article, { isPublished: true });

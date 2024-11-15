@@ -12,8 +12,12 @@ export class Article {
 
     @Column({ type: 'boolean', name: 'is_published', default: false })
     isPublished: boolean
+
+    @Column({ type: 'numeric',  name:'author_id'})
+    authorId: number
     
     @ManyToOne(()=> User, user => user.id)
-    @JoinColumn({ name: 'author_id'})
-    authorId: number
+    @JoinColumn({ name: 'user_id'})
+    user: User
+    
 }

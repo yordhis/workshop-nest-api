@@ -4,42 +4,43 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { Article } from "./entities/article.entity"
 import { Like, Repository } from "typeorm"
 import { UpdateArticleDto } from "./dto/update-articles.dto"
-import { CaslAbilityFactory } from "src/casl/casl-ability.factory"
-import { Action } from "src/casl/types/action.enum"
+import { User } from "src/users/entities/user.entity"
 
 @Injectable()
 export class ArticleService {
     constructor(
         @InjectRepository(Article)
         public readonly articleRepository: Repository<Article>,
-        private readonly caslAbilityFactory: CaslAbilityFactory
+        @InjectRepository(User)
+        public readonly userRepository: Repository<User>
     ){}
 
-    async find( user:any ) {
-        const ability = this.caslAbilityFactory.createForUser(user)
-        if( !ability.can(Action.Read, Article) ) throw new UnauthorizedException()
-        return await this.articleRepository.find({ relations: ['authorId']})
+    async find( ) {
+        return await this.articleRepository.find({ relations: ['user']})
     }
     
     async findOne(id: number){
-        return await this.articleRepository.findOneBy({ id })
+        const article = await this.articleRepository.findOne({ where:{id}, relations:['user'] })
+        if(!article){
+            throw new NotFoundException(`El articulo con el id:${id}, no existe!.`)
+        }
+        return  article
     }
    
     async filterForMessage( description: string ){
-        return await this.articleRepository.findBy({ description: Like(`%${description}%`)  })
+        return await this.articleRepository.find({ where: { description: Like(`%${description}%`) }, relations:['user'] })
     }
    
-    async filterForAuthor( authorId: number ){
-        return await this.articleRepository.find({  where:{ authorId } })
+    async filterForAuthor( userId: number ){
+        const user = await this.userRepository.findOneBy({id:userId})
+        return await this.articleRepository.find({ where: { user }, relations:['user'] })
     }
 
     async create(createArticleDto: CreateArticleDto, user:any){
 
-        const ability = this.caslAbilityFactory.createForUser(user)
-        if( !ability.can(Action.Create, Article) ) throw new UnauthorizedException()
-
         const newArticle = new Article
         newArticle.authorId = user.id
+        newArticle.user = user
         newArticle.description = createArticleDto.description
         
         return await this.articleRepository.save(newArticle)
@@ -54,6 +55,7 @@ export class ArticleService {
                 status: HttpStatus.NOT_FOUND
             })
         }
+
         /** Se setean los nuevos datos */
         article.description = data.description
         article.isPublished = data.isPublished
