@@ -9,6 +9,7 @@ import { RolesGuard } from './auth/guards/roles.guard';
 import { ArticlesModule } from './articles/articles.module';
 import { CaslModule } from './casl/casl.module';
 import { PoliciesGuard } from './casl/guards/policies.guard';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { PoliciesGuard } from './casl/guards/policies.guard';
     UsersModule,
     AuthModule,
     ArticlesModule,
-    CaslModule
+    CaslModule,
+    EventsModule
   ],
   providers: [
     {

@@ -31,12 +31,6 @@ export class CaslAbilityFactory {
         can(Action.Create, Article); // read-only access to everything (Acceso a escribir articulos)
       }
 
-      /** Aqui se asigna permisos de edicion si le pertenece el articulo al usuario */
-      cannot(Action.Update, Article, { user:user });
-
-      /** Si ya esta publicado no permite eliminar */
-      cannot(Action.Delete, Article, { isPublished: true });
-
       return build({
         detectSubjectType: (item) =>
             item.constructor as ExtractSubjectType<Subjects>,
