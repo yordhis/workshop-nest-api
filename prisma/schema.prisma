@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model Article {
+  id           Int     @id(map: "PK_0a6e2c450d83e0b6052c2793334") @default(autoincrement())
+  description  String
+  is_published Boolean @default(false)
+  author_id    Decimal @db.Decimal
+  user_id      Int?
+  users        User?  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_87bb15395540ae06337a486a77a")
+  @@map("articles")
+
+}
+
+model Profile {
+  id        Int     @id(map: "PK_8e520eb4da7dc01d0e190447c8e") @default(autoincrement())
+  name      String
+  last_name String? @db.VarChar
+  email     String
+  age       User?
+  @@map("profiles")
+}
+
+model User {
+  id         Int                @id(map: "PK_a3ffb1c0c8416b9fc6f907b7433") @default(autoincrement())
+  username   String             @unique(map: "UQ_fe0bb3f6520ee0469504521e710")
+  password   String
+  active     Boolean            @default(false)
+  roles      users_roles_enum[] @default([ADMIN])
+  profile_id Int?               @unique(map: "REL_23371445bd80cb3e413089551b")
+  articles   Article[]
+  profiles   Profile?          @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_23371445bd80cb3e413089551bf")
+  @@map("users")
+}
+
+enum users_roles_enum {
+  ADMIN
+  USUARIO
+}

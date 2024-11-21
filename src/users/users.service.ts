@@ -1,29 +1,27 @@
 import { HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './entities/user.entity';
+// import { User } from './entities/user.entity';
 import { Profile } from './entities/profile.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { hash, compare } from 'bcryptjs'
 import { AuthDto } from 'src/auth/dto/auth.dto';
 
+/** prisma db */
+import { User, Prisma } from '@prisma/client'
+import { PrismaService } from 'src/prisma.service';
+
 @Injectable()
 export class UsersService {
-    constructor(
-        @InjectRepository(User)
-        private readonly userRepository: Repository<User>,
+    constructor(private prisma: PrismaService) {}
 
-        @InjectRepository(Profile)
-        private readonly profileRepository: Repository<Profile>
-    ) { }
-
-    async findAll() {
-        return await this.userRepository.find({ relations: ['profile'] })
+    async findAll(): Promise<User[] | []> {
+        return await this.prisma.user.findMany()
     }
 
-    async findOne(id: number) {
-        const user = await this.userRepository.findOne({ where: { id }, select: ['id', 'username'], relations: ['profile'] })
+    async findOne(id: number): Promise<User | null> {
+        const user = await this.prisma.user.findUnique({ where: { id } })
 
         if (!user) {
             throw new NotFoundException({

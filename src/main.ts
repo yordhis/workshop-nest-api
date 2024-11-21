@@ -23,9 +23,9 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe)
 
   /** Levantamos el puerto 3001 */
-  await app.listen(process.env.APP_PORT || 3001);
+  await app.listen(process.env.APP_PORT || 3001, '0.0.0.0');
 
   /** Mostramos donde esta corriendo la app por consola */
-  console.log(`Application is running on: ${await app.getUrl()} - con fastify`);
+  console.log(`Application is running on: ${await app.getUrl()} - con fastify + prisma`);
 }
 bootstrap();
