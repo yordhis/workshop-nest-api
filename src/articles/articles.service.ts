@@ -27,8 +27,8 @@ export class ArticleService {
         return  article
     }
    
-    async filterForMessage( description: string ){
-        return await this.articleRepository.find({ where: { description: Like(`%${description}%`) }, relations:['user'] })
+    async filterForMessage( content: string ){
+        return await this.articleRepository.find({ where: { content: Like(`%${content}%`) }, relations:['user'] })
     }
    
     async filterForAuthor( userId: number ){
@@ -41,7 +41,8 @@ export class ArticleService {
         const newArticle = new Article
         newArticle.authorId = user.id
         newArticle.user = user
-        newArticle.description = createArticleDto.description
+        newArticle.title = createArticleDto.title
+        newArticle.content = createArticleDto.description
         
         return await this.articleRepository.save(newArticle)
     }
@@ -57,7 +58,8 @@ export class ArticleService {
         }
 
         /** Se setean los nuevos datos */
-        article.description = data.description
+        article.title = data.title
+        article.content = data.content
         article.isPublished = data.isPublished
         await this.articleRepository.save(article)
 

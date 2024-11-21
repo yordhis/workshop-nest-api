@@ -10,7 +10,7 @@ import { AuthDto } from 'src/auth/dto/auth.dto';
 
 /** prisma db */
 import { User, Prisma } from '@prisma/client'
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class UsersService {
@@ -20,26 +20,24 @@ export class UsersService {
         return await this.prisma.user.findMany()
     }
 
-    async findOne(id: number): Promise<User | null> {
-        const user = await this.prisma.user.findUnique({ where: { id } })
+    // async findOne(id: Prisma.UserWhereUniqueInput): Promise<User | null> {
+    //     const user = await this.prisma.user.findUnique({ where: { id } })
 
-        if (!user) {
-            throw new NotFoundException({
-                message: `Usuario con id: ${id} no existe`,
-                status: HttpStatus.NOT_FOUND
-            })
-        }
-        return user
+    //     if (!user) {
+    //         throw new NotFoundException({
+    //             message: `Usuario con id: ${id} no existe`,
+    //             status: HttpStatus.NOT_FOUND
+    //         })
+    //     }
+    //     return user
 
-    }
+    // }
 
     async login(username: string, password: string) {
 
         /** Verify if user exits */
-        const user = await this.userRepository.findOne({
-            where: { username },
-            select: ['id', 'username', 'password', 'roles', 'active']
-        })
+        const user = await this.prisma.user.findFirst({ where: { username } })
+
         if (!user) throw new UnauthorizedException(`Usuario *${username}* no encontrado`)
 
         /** validate password */
@@ -52,14 +50,12 @@ export class UsersService {
 
     async register( payload: AuthDto){
 
-        const newUser = new User()
-        newUser.username = payload.username
-        newUser.password = await this.passwordHash(payload.password)
-        newUser.active = true
-
-        const createdUser = await this.userRepository.save(newUser)
-
-        return createdUser
+        return await this.prisma.user.create({
+            data:{
+                username: payload.username,
+                password:  await this.passwordHash(payload.password)
+            }
+        })
     }
 
     async passwordCompare(passwordPayload: string, passwordHash: string) {
@@ -70,57 +66,40 @@ export class UsersService {
         return hash(password, 10)
     }
 
-    async create(payload: CreateUserDto) {
-        const newProfile = new Profile()
-        newProfile.name = payload.name
-        newProfile.lastname = payload.lastname
-        newProfile.email = payload.email
-        newProfile.age = payload.age
-
-        const createdProfile = await this.profileRepository.save(newProfile)
-
-        const newUser = new User()
-        newUser.username = payload.username
-        newUser.password = await this.passwordHash(payload.password)
-        newUser.roles =  payload.roles 
-        newUser.active = true
-        newUser.profile = createdProfile
-
-        const createdUser = await this.userRepository.save(newUser)
-
-        return createdUser
+    async create(data: Prisma.UserCreateInput): Promise<User> {
+        return this.prisma.user.create({ data })
     }
 
-    async delete(id: number) {
-        const user = await this.userRepository.findOne({ where: { id }, relations: ['profile'] })
+    // async delete(id: Prisma.UserWhereUniqueInput): Promise<User> {
+    //     const user = await this.userRepository.findOne({ where: { id }, relations: ['profile'] })
 
-        if (!user) {
-            throw new NotFoundException({
-                message: `Usuario con id: ${id} no existe`,
-                status: HttpStatus.NOT_FOUND
-            })
-        }
+    //     if (!user) {
+    //         throw new NotFoundException({
+    //             message: `Usuario con id: ${id} no existe`,
+    //             status: HttpStatus.NOT_FOUND
+    //         })
+    //     }
 
-        await this.userRepository.delete(id)
-        await this.profileRepository.delete(user.profile.id)
-        return user
+    //     await this.userRepository.delete(id)
+    //     await this.profileRepository.delete(user.profile.id)
+    //     return user
 
-    }
+    // }
 
-    async update(id: number, payload: UpdateUserDto) {
-        const user = await this.userRepository.findOne({ where: { id }, relations: ['profile'] })
+    // async update(id: number, payload: UpdateUserDto) {
+    //     const user = await this.userRepository.findOne({ where: { id }, relations: ['profile'] })
 
-        if (!user) {
-            throw new NotFoundException({
-                message: `Usuario con id: ${id} no existe`,
-                status: HttpStatus.NOT_FOUND
-            })
-        }
+    //     if (!user) {
+    //         throw new NotFoundException({
+    //             message: `Usuario con id: ${id} no existe`,
+    //             status: HttpStatus.NOT_FOUND
+    //         })
+    //     }
 
-        user.password = await this.passwordHash(payload.password)
-        await this.userRepository.save(user)
-        return user
-    }
+    //     user.password = await this.passwordHash(payload.password)
+    //     await this.userRepository.save(user)
+    //     return user
+    // }
 
 
 }

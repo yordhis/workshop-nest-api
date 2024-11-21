@@ -9,34 +9,34 @@ datasource db {
 
 
 model Article {
-  id           Int     @id(map: "PK_0a6e2c450d83e0b6052c2793334") @default(autoincrement())
-  description  String
-  is_published Boolean @default(false)
-  author_id    Decimal @db.Decimal
-  user_id      Int?
-  users        User?  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_87bb15395540ae06337a486a77a")
+  id            Int      @default(autoincrement()) @id
+  title         String
+  content       String?
+  is_published  Boolean  @default(false)
+  users         User?    @relation(fields: [authorId], references: [id])
+  authorId      Int?      @map("author_id")
   @@map("articles")
 
 }
 
 model Profile {
-  id        Int     @id(map: "PK_8e520eb4da7dc01d0e190447c8e") @default(autoincrement())
-  name      String
-  last_name String? @db.VarChar
+  id        Int       @default(autoincrement()) @id
+  name      String    
+  lastName  String?   @map("last_name")
   email     String
   age       User?
   @@map("profiles")
 }
 
 model User {
-  id         Int                @id(map: "PK_a3ffb1c0c8416b9fc6f907b7433") @default(autoincrement())
-  username   String             @unique(map: "UQ_fe0bb3f6520ee0469504521e710")
-  password   String
-  active     Boolean            @default(false)
-  roles      users_roles_enum[] @default([ADMIN])
-  profile_id Int?               @unique(map: "REL_23371445bd80cb3e413089551b")
-  articles   Article[]
-  profiles   Profile?          @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_23371445bd80cb3e413089551bf")
+  id          Int                 @default(autoincrement()) @id
+  username    String              @unique()
+  password    String
+  active      Boolean             @default(true)
+  roles       users_roles_enum[]     @default([ADMIN])
+  articles    Article[]
+  profileId   Int?                @map("profile_id") @unique()
+  profiles    Profile?           @relation(fields: [profileId], references: [id])
   @@map("users")
 }
 

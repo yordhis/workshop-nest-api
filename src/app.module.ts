@@ -10,6 +10,7 @@ import { ArticlesModule } from './articles/articles.module';
 import { CaslModule } from './casl/casl.module';
 import { PoliciesGuard } from './casl/guards/policies.guard';
 import { EventsModule } from './events/events.module';
+import { PrismaService } from './prisma/prisma.service';
 
 @Module({
   imports: [
@@ -42,7 +43,8 @@ import { EventsModule } from './events/events.module';
     {
       provide: APP_GUARD,
       useClass: PoliciesGuard,
-    }
+    },
+
   ],
 })
 export class AppModule { }

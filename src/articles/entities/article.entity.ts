@@ -7,8 +7,11 @@ export class Article {
     @PrimaryGeneratedColumn('increment')
     id: number
 
-    @Column({ type: 'text'})
-    description: string
+    @Column()
+    title: string
+
+    @Column()
+    content: string
 
     @Column({ type: 'boolean', name: 'is_published', default: false })
     isPublished: boolean

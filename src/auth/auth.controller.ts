@@ -19,6 +19,7 @@ export class AuthController {
   @Post('register')
   @Public()
   register(@Body() payload: AuthDto) {
+   
     return this.authService.register( payload );
   }
 

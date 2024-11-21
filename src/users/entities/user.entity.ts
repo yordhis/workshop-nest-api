@@ -9,13 +9,13 @@ export class User {
     @PrimaryGeneratedColumn('increment')
     id:number
 
-    @Column({ type: 'text', unique:true })
+    @Column({ unique:true })
     username: string
 
-    @Column({ type: 'text' })
+    @Column()
     password: string
 
-    @Column({ type: 'boolean', default: false })
+    @Column({ type: 'boolean', default: true })
     active: boolean
 
     @Column({ 

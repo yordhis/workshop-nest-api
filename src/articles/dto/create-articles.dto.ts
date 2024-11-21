@@ -5,4 +5,8 @@ export class CreateArticleDto {
     @IsString()
     description: string
 
+    @IsNotEmpty()
+    @IsString()
+    title: string
+
 }

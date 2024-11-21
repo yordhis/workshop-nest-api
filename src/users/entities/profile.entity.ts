@@ -11,9 +11,6 @@ export class Profile {
     
     @Column({ nullable:true, name:'last_name' })
     lastname: string
-    
-    @Column({ type: 'text' })
-    email: string
 
     @Column()
     age: number
