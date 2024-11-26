@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadGatewayException, HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 // import { User } from './entities/user.entity';
@@ -20,18 +20,18 @@ export class UsersService {
         return await this.prisma.user.findMany()
     }
 
-    // async findOne(id: Prisma.UserWhereUniqueInput): Promise<User | null> {
-    //     const user = await this.prisma.user.findUnique({ where: { id } })
+    async findOne( id: number ): Promise<User | null> {
+        const user = await this.prisma.user.findUnique({ where: { id } })
 
-    //     if (!user) {
-    //         throw new NotFoundException({
-    //             message: `Usuario con id: ${id} no existe`,
-    //             status: HttpStatus.NOT_FOUND
-    //         })
-    //     }
-    //     return user
+        if (!user) {
+            throw new NotFoundException({
+                message: `Usuario con id: ${id} no existe`,
+                status: HttpStatus.NOT_FOUND
+            })
+        }
+        return user
 
-    // }
+    }
 
     async login(username: string, password: string) {
 
@@ -66,8 +66,9 @@ export class UsersService {
         return hash(password, 10)
     }
 
-    async create(data: Prisma.UserCreateInput): Promise<User> {
-        return this.prisma.user.create({ data })
+    async create(data: Prisma.UserCreateInput): Promise<User | string> {
+        const user = this.prisma.user.create({ data })
+        return user
     }
 
     // async delete(id: Prisma.UserWhereUniqueInput): Promise<User> {

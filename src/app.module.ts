@@ -4,13 +4,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import {  UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthGuard } from './auth/guards/auth.guard';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { ArticlesModule } from './articles/articles.module';
 import { CaslModule } from './casl/casl.module';
 import { PoliciesGuard } from './casl/guards/policies.guard';
 import { EventsModule } from './events/events.module';
 import { PrismaService } from './prisma/prisma.service';
+import { HttpExceptionFilter } from './handlers/http-exception.filter';
 
 @Module({
   imports: [
@@ -43,6 +44,10 @@ import { PrismaService } from './prisma/prisma.service';
     {
       provide: APP_GUARD,
       useClass: PoliciesGuard,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
     },
 
   ],

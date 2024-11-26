@@ -12,20 +12,4 @@ export class CreateUserDto {
 
     @IsArray()
     roles: UserRoles[]
-    
-    @IsString()
-    @IsNotEmpty()
-    name: string
-
-    @IsString()
-    @IsNotEmpty()
-    lastname: string
-
-    @IsEmail()
-    @IsNotEmpty()
-    email: string
-
-    @IsNumber()
-    @IsNotEmpty()
-    age:number
 }

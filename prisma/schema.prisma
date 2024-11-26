@@ -33,10 +33,10 @@ model User {
   username    String              @unique()
   password    String
   active      Boolean             @default(true)
-  roles       users_roles_enum[]     @default([ADMIN])
+  roles       users_roles_enum[]  @default([ADMIN])
   articles    Article[]
   profileId   Int?                @map("profile_id") @unique()
-  profiles    Profile?           @relation(fields: [profileId], references: [id])
+  profiles    Profile?            @relation(fields: [profileId], references: [id])
   @@map("users")
 }
 

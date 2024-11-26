@@ -6,6 +6,7 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
+import { HttpExceptionFilter } from './handlers/http-exception.filter';
 
 async function bootstrap() {
   /** 
@@ -18,6 +19,9 @@ async function bootstrap() {
     new FastifyAdapter(),
     { cors: true }
   );
+
+  /** Uso global del manejo de las excepciones */
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   /** Se usan los validadores globales PIPE para los parametro enviados por http request */
   app.useGlobalPipes(new ValidationPipe)

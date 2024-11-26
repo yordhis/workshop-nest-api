@@ -1,42 +1,47 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, HttpException, HttpStatus, InternalServerErrorException, NotFoundException, Param, ParseIntPipe, Patch, Post, UseFilters } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserRoles } from './types/Roles';
-import { Prisma } from '@prisma/client';
+import { HttpExceptionFilter } from 'src/handlers/http-exception.filter';
 
 @Roles(UserRoles.ADMIN)
 @Controller('users')
 export class UsersController {
     constructor(
         private readonly usersService: UsersService
-    ){}
+    ) { }
 
-@Get()
-findAll(){
-    return this.usersService.findAll()
-}
+    @Get()
+    findAll() {
+        return this.usersService.findAll()
+    }
 
-// @Get(':id')
-// findOne(@Param('id' ) id: Prisma.UserWhereUniqueInput ){
-//     return this.usersService.findOne(id)
-// }
+    @Get(':id')
+    findOne(@Param('id', ParseIntPipe) id: number) {
+        return this.usersService.findOne(id)
+    }
 
-@Post()
-create( @Body() body: CreateUserDto ){
-    return this.usersService.create( body )
-}
+    @Post()
+    async create(@Body() body: CreateUserDto) {
+        try {
+            return await this.usersService.create(body)
+        } catch (error) {
+            throw new BadRequestException('¡duplicate user!',{ cause: error })
+         }
 
-// @Delete(':id')
-// delete( @Param('id', ParseIntPipe) id: number ){
-//     return this.usersService.delete( id )
-// }
+    }
 
-// @Patch(':id')
-// update( @Param('id', ParseIntPipe) id:number, @Body() body:UpdateUserDto ){
-//     return this.usersService.update(id, body)
-// }
+    // @Delete(':id')
+    // delete( @Param('id', ParseIntPipe) id: number ){
+    //     return this.usersService.delete( id )
+    // }
+
+    // @Patch(':id')
+    // update( @Param('id', ParseIntPipe) id:number, @Body() body:UpdateUserDto ){
+    //     return this.usersService.update(id, body)
+    // }
 
 
 }
