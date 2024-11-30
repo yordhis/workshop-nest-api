@@ -12,13 +12,14 @@ export class AuthService {
   ) {}
 
   async login( credentials: AuthDto ) {
-    const { username, password } = credentials
+    const { email, password } = credentials
 
-    const user = await this.usersService.login( username, password )
+    const user = await this.usersService.login( email, password )
 
     const payload = { 
       id: user.id,
       username: user.username,
+      email: user.email,
       roles: user.roles,
       active: user.active
     }

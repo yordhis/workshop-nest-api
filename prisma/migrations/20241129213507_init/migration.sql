@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "userRolesEnum" AS ENUM ('ADMIN', 'USUARIO');
+CREATE TYPE "users_roles_enum" AS ENUM ('ADMIN', 'USUARIO');
 
 -- CreateTable
 CREATE TABLE "articles" (
@@ -17,7 +17,6 @@ CREATE TABLE "profiles" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "last_name" TEXT,
-    "email" TEXT NOT NULL,
 
     CONSTRAINT "profiles_pkey" PRIMARY KEY ("id")
 );
@@ -25,11 +24,11 @@ CREATE TABLE "profiles" (
 -- CreateTable
 CREATE TABLE "users" (
     "id" SERIAL NOT NULL,
-    "username" TEXT NOT NULL,
-    "email" TEXT,
+    "username" TEXT,
+    "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "active" BOOLEAN NOT NULL DEFAULT true,
-    "roles" "userRolesEnum"[] DEFAULT ARRAY['ADMIN']::"userRolesEnum"[],
+    "roles" "users_roles_enum"[] DEFAULT ARRAY['ADMIN']::"users_roles_enum"[],
     "profile_id" INTEGER,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")

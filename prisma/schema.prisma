@@ -12,9 +12,9 @@ model Article {
   id            Int      @default(autoincrement()) @id
   title         String
   content       String?
-  is_published  Boolean  @default(false)
+  isPublished   Boolean?   @map("is_published") @default(false)
   users         User?    @relation(fields: [authorId], references: [id])
-  authorId      Int?      @map("author_id")
+  authorId      Int?     @map("author_id")
   @@map("articles")
 
 }
@@ -23,14 +23,14 @@ model Profile {
   id        Int       @default(autoincrement()) @id
   name      String    
   lastName  String?   @map("last_name")
-  email     String
   age       User?
   @@map("profiles")
 }
 
 model User {
   id          Int                 @default(autoincrement()) @id
-  username    String              @unique()
+  username    String?             @unique()
+  email       String              @unique()
   password    String
   active      Boolean             @default(true)
   roles       users_roles_enum[]  @default([ADMIN])

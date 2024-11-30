@@ -1,10 +1,4 @@
-import { BadGatewayException, HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-// import { User } from './entities/user.entity';
-import { Profile } from './entities/profile.entity';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { hash, compare } from 'bcryptjs'
 import { AuthDto } from 'src/auth/dto/auth.dto';
 
@@ -33,12 +27,12 @@ export class UsersService {
 
     }
 
-    async login(username: string, password: string) {
+    async login(email: string, password: string) {
 
         /** Verify if user exits */
-        const user = await this.prisma.user.findFirst({ where: { username } })
+        const user = await this.prisma.user.findFirst({ where: { email } })
 
-        if (!user) throw new UnauthorizedException(`Usuario *${username}* no encontrado`)
+        if (!user) throw new UnauthorizedException(`Usuario *${email}* no encontrado`)
 
         /** validate password */
         const isOk = await this.passwordCompare(password, user.password)
@@ -49,10 +43,10 @@ export class UsersService {
     }
 
     async register( payload: AuthDto){
-
         return await this.prisma.user.create({
             data:{
-                username: payload.username,
+                username: payload.email.split('@')[0],
+                email: payload.email,
                 password:  await this.passwordHash(payload.password)
             }
         })
@@ -71,36 +65,13 @@ export class UsersService {
         return user
     }
 
-    // async delete(id: Prisma.UserWhereUniqueInput): Promise<User> {
-    //     const user = await this.userRepository.findOne({ where: { id }, relations: ['profile'] })
+    async delete(id: Prisma.UserWhereUniqueInput) {
+        /*** terminar */
+    }
 
-    //     if (!user) {
-    //         throw new NotFoundException({
-    //             message: `Usuario con id: ${id} no existe`,
-    //             status: HttpStatus.NOT_FOUND
-    //         })
-    //     }
-
-    //     await this.userRepository.delete(id)
-    //     await this.profileRepository.delete(user.profile.id)
-    //     return user
-
-    // }
-
-    // async update(id: number, payload: UpdateUserDto) {
-    //     const user = await this.userRepository.findOne({ where: { id }, relations: ['profile'] })
-
-    //     if (!user) {
-    //         throw new NotFoundException({
-    //             message: `Usuario con id: ${id} no existe`,
-    //             status: HttpStatus.NOT_FOUND
-    //         })
-    //     }
-
-    //     user.password = await this.passwordHash(payload.password)
-    //     await this.userRepository.save(user)
-    //     return user
-    // }
+    async update(id: number, payload: any) {
+        /*** terminar */
+    }
 
 
 }

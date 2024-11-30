@@ -1,36 +1,24 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import {  UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthGuard } from './auth/guards/auth.guard';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { ArticlesModule } from './articles/articles.module';
-import { CaslModule } from './casl/casl.module';
-import { PoliciesGuard } from './casl/guards/policies.guard';
-import { EventsModule } from './events/events.module';
-import { PrismaService } from './prisma/prisma.service';
 import { HttpExceptionFilter } from './handlers/http-exception.filter';
+import { PrismaModule } from './prisma/prisma.module';
+
+
+
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
-    TypeOrmModule.forRoot({
-      type: "postgres",
-      host: process.env.DB_HOST,
-      port: +process.env.DB_PORT || 5432,
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_DATABASE,
-      autoLoadEntities: true,
-      synchronize: true,
-    }),
+    ConfigModule.forRoot({ isGlobal: true }),
+    PrismaModule,
     UsersModule,
     AuthModule,
     ArticlesModule,
-    CaslModule,
-    EventsModule
   ],
   providers: [
     {
@@ -41,10 +29,10 @@ import { HttpExceptionFilter } from './handlers/http-exception.filter';
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
-    {
-      provide: APP_GUARD,
-      useClass: PoliciesGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: PoliciesGuard,
+    // },
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,

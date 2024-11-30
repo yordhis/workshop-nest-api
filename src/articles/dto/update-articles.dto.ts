@@ -1,16 +1,19 @@
-import { IsBoolean, IsNotEmpty, IsNumber, IsString } from "class-validator"
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator"
 
 export class UpdateArticleDto {
     @IsString()
     @IsNotEmpty()
-    title: string
+    @IsOptional()
+    title?: string
 
     @IsString()
     @IsNotEmpty()
-    content: string
+    @IsOptional()
+    content?: string
 
     @IsBoolean()
     @IsNotEmpty()
-    isPublished: boolean
+    @IsOptional()
+    isPublished?: boolean
 
 }

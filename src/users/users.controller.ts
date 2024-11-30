@@ -4,7 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { UserRoles } from './types/Roles';
-import { HttpExceptionFilter } from 'src/handlers/http-exception.filter';
+
 
 @Roles(UserRoles.ADMIN)
 @Controller('users')
@@ -28,20 +28,20 @@ export class UsersController {
         try {
             return await this.usersService.create(body)
         } catch (error) {
-            throw new BadRequestException('¡duplicate user!',{ cause: error })
+            throw new BadRequestException('¡Error: duplicate user!',{ cause: error })
          }
 
     }
 
-    // @Delete(':id')
-    // delete( @Param('id', ParseIntPipe) id: number ){
-    //     return this.usersService.delete( id )
-    // }
+    @Delete(':id')
+    delete( @Param('id', ParseIntPipe) id: number ){
+       
+    }
 
-    // @Patch(':id')
-    // update( @Param('id', ParseIntPipe) id:number, @Body() body:UpdateUserDto ){
-    //     return this.usersService.update(id, body)
-    // }
+    @Patch(':id')
+    update( @Param('id', ParseIntPipe) id:number, @Body() body:UpdateUserDto ){
+        
+    }
 
 
 }
