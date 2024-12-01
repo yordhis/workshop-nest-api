@@ -1,12 +1,13 @@
-import { IsArray, IsEmail, IsNotEmpty, IsNumber, IsString } from "class-validator"
+import { IsArray, IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator"
 import { UserRoles } from "../types/Roles"
 
 export class CreateUserDto {
     @IsString()
     @IsNotEmpty()
+    @IsOptional()
     username: string
 
-    @IsString()
+    @IsEmail()
     @IsNotEmpty()
     email: string
 

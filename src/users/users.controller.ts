@@ -25,22 +25,19 @@ export class UsersController {
 
     @Post()
     async create(@Body() body: CreateUserDto) {
-        try {
-            return await this.usersService.create(body)
-        } catch (error) {
-            throw new BadRequestException('¡Error: duplicate user!',{ cause: error })
-         }
+        return await this.usersService.create(body)
+    }
 
+  
+
+    @Patch(':id')
+    async update( @Param('id', ParseIntPipe) where:number, @Body() data:UpdateUserDto ){
+        
     }
 
     @Delete(':id')
-    delete( @Param('id', ParseIntPipe) id: number ){
-       
-    }
-
-    @Patch(':id')
-    update( @Param('id', ParseIntPipe) id:number, @Body() body:UpdateUserDto ){
-        
+    async delete( @Param('id', ParseIntPipe) id: number ){
+       return await this.usersService.delete( { id } )
     }
 
 

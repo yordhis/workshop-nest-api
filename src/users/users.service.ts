@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { hash, compare } from 'bcryptjs'
 import { AuthDto } from 'src/auth/dto/auth.dto';
 
@@ -15,24 +15,21 @@ export class UsersService {
     }
 
     async findOne( id: number ): Promise<User | null> {
-        const user = await this.prisma.user.findUnique({ where: { id } })
 
-        if (!user) {
-            throw new NotFoundException({
-                message: `Usuario con id: ${id} no existe`,
-                status: HttpStatus.NOT_FOUND
-            })
-        }
+        const user = await this.prisma.user.findUnique({ where: { id } })
+        
+        if (!user) throw new NotFoundException('User does not exist')
+
         return user
 
     }
 
-    async login(email: string, password: string) {
+    async login(email: string, password: string): Promise<User | null> {
 
         /** Verify if user exits */
         const user = await this.prisma.user.findFirst({ where: { email } })
 
-        if (!user) throw new UnauthorizedException(`Usuario *${email}* no encontrado`)
+        if (!user) throw new UnauthorizedException(`User *${email}* not found`)
 
         /** validate password */
         const isOk = await this.passwordCompare(password, user.password)
@@ -42,12 +39,17 @@ export class UsersService {
 
     }
 
-    async register( payload: AuthDto){
+    async register( data: AuthDto): Promise<User | null>{
+        const { email } = data
+        const userExists = await this.prisma.user.findUnique({ where: { email } })
+
+        if(userExists) throw new BadRequestException('Registered user on our platform')
+
         return await this.prisma.user.create({
             data:{
-                username: payload.email.split('@')[0],
-                email: payload.email,
-                password:  await this.passwordHash(payload.password)
+                username: data.email.split('@')[0],
+                email: data.email,
+                password:  await this.passwordHash(data.password)
             }
         })
     }
@@ -61,15 +63,32 @@ export class UsersService {
     }
 
     async create(data: Prisma.UserCreateInput): Promise<User | string> {
-        const user = this.prisma.user.create({ data })
+        const { email } = data
+        const userExists = await this.prisma.user.findUnique({ where: { email } })
+
+        if(userExists) throw new BadRequestException('Registered user on our platform')
+
+        const user = this.prisma.user.create({ 
+            data:{
+                username: data.email.split('@')[0],
+                email: data.email,
+                password:  await this.passwordHash(data.password)
+            }
+         })
+
         return user
     }
 
-    async delete(id: Prisma.UserWhereUniqueInput) {
-        /*** terminar */
+    async delete(where: Prisma.UserWhereUniqueInput) {
+        const { id } = where
+
+        await this.findOne(id)
+
+        return await this.prisma.user.delete({ where: { id } })
+
     }
 
-    async update(id: number, payload: any) {
+    async update(where: number, data: any) {
         /*** terminar */
     }
 
