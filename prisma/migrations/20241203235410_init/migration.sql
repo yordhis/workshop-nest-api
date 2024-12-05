@@ -1,12 +1,12 @@
 -- CreateEnum
-CREATE TYPE "users_roles_enum" AS ENUM ('ADMIN', 'USUARIO');
+CREATE TYPE "users_roles_enum" AS ENUM ('ADMIN', 'USER');
 
 -- CreateTable
 CREATE TABLE "articles" (
     "id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
     "content" TEXT,
-    "is_published" BOOLEAN NOT NULL DEFAULT false,
+    "is_published" BOOLEAN DEFAULT false,
     "author_id" INTEGER,
 
     CONSTRAINT "articles_pkey" PRIMARY KEY ("id")
@@ -44,7 +44,7 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 CREATE UNIQUE INDEX "users_profile_id_key" ON "users"("profile_id");
 
 -- AddForeignKey
-ALTER TABLE "articles" ADD CONSTRAINT "articles_author_id_fkey" FOREIGN KEY ("author_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "articles" ADD CONSTRAINT "articles_author_id_fkey" FOREIGN KEY ("author_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "users" ADD CONSTRAINT "users_profile_id_fkey" FOREIGN KEY ("profile_id") REFERENCES "profiles"("id") ON DELETE SET NULL ON UPDATE CASCADE;

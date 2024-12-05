@@ -13,7 +13,7 @@ model Article {
   title         String
   content       String?
   isPublished   Boolean?   @map("is_published") @default(false)
-  users         User?    @relation(fields: [authorId], references: [id])
+  users         User?    @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId      Int?     @map("author_id")
   @@map("articles")
 
@@ -34,7 +34,7 @@ model User {
   password    String
   active      Boolean             @default(true)
   roles       users_roles_enum[]  @default([ADMIN])
-  articles    Article[]
+  articles    Article[]           
   profileId   Int?                @map("profile_id") @unique()
   profiles    Profile?            @relation(fields: [profileId], references: [id])
   @@map("users")
@@ -42,5 +42,5 @@ model User {
 
 enum users_roles_enum {
   ADMIN
-  USUARIO
+  USER
 }
