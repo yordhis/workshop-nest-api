@@ -14,14 +14,43 @@ export class UsersService {
         return await this.prisma.user.findMany()
     }
 
-    async findOne( id: number ): Promise<User | null> {
-
-        const user = await this.prisma.user.findUnique({ where: { id } })
-        
+    async findOne( where: Prisma.UserWhereUniqueInput ): Promise<User | null> {
+        const user = await this.prisma.user.findUnique({ where })
         if (!user) throw new NotFoundException('User does not exist')
-
         return user
 
+    }
+
+    async create(data: Prisma.UserCreateInput): Promise<User | string> {
+        const { email } = data
+        const userExists = await this.prisma.user.findUnique({ where: { email } })
+
+        if(userExists) throw new BadRequestException('Registered user on our platform')
+
+        const user = this.prisma.user.create({ 
+            data:{
+                username: data.email.split('@')[0],
+                email: data.email,
+                password:  await this.passwordHash(data.password)
+            }
+         })
+
+        return user
+    }
+
+    async delete(
+        where: Prisma.UserWhereUniqueInput
+    ): Promise< User | null> {
+        await this.findOne(where)
+        return await this.prisma.user.delete({ where })
+    }
+
+    async update(
+        where: Prisma.UserWhereUniqueInput, 
+        data: Prisma.UserUpdateInput
+    ): Promise< User | null> {
+        
+        return await this.prisma.user.update({ where, data })
     }
 
     async login(email: string, password: string): Promise<User | null> {
@@ -39,7 +68,7 @@ export class UsersService {
 
     }
 
-    async register( data: AuthDto): Promise<User | null>{
+    async register( data: Prisma.UserCreateInput): Promise<User | null>{
         const { email } = data
         const userExists = await this.prisma.user.findUnique({ where: { email } })
 
@@ -60,36 +89,6 @@ export class UsersService {
 
     async passwordHash(password: string) {
         return hash(password, 10)
-    }
-
-    async create(data: Prisma.UserCreateInput): Promise<User | string> {
-        const { email } = data
-        const userExists = await this.prisma.user.findUnique({ where: { email } })
-
-        if(userExists) throw new BadRequestException('Registered user on our platform')
-
-        const user = this.prisma.user.create({ 
-            data:{
-                username: data.email.split('@')[0],
-                email: data.email,
-                password:  await this.passwordHash(data.password)
-            }
-         })
-
-        return user
-    }
-
-    async delete(where: Prisma.UserWhereUniqueInput) {
-        const { id } = where
-
-        await this.findOne(id)
-
-        return await this.prisma.user.delete({ where: { id } })
-
-    }
-
-    async update(where: number, data: any) {
-        /*** terminar */
     }
 
 

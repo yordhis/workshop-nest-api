@@ -13,11 +13,7 @@ export class AuthController {
   @Post('login')
   @Public()
   login(@Body() payload: AuthDto) {
-    // try {
       return this.authService.login( payload );
-    // } catch (error) {
-    //   throw new BadRequestException('¡Login Error!', {cause:error})
-    // }
   }
 
   @HttpCode(HttpStatus.CREATED)
